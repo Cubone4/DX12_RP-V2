@@ -278,6 +278,7 @@ bool RenderManager::Initialize(HWND hwnd)
     pso.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
     pso.SampleDesc.Count = 1;
 
+    // Define ds (DEPTH_STENCIL_DESC)
     D3D12_DEPTH_STENCIL_DESC ds = {};
     ds.DepthEnable = TRUE;
     ds.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
