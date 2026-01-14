@@ -31,7 +31,7 @@ private:
 
     std::vector<std::function<void()>> updateCallback;
 
-    static const UINT FrameCount = 2;
+    static const UINT FrameCount = 3;
     std::vector<Vertex> vertices;
     
     

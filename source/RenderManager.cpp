@@ -17,7 +17,6 @@ bool RenderManager::Initialize(HWND hwnd)
 {
     ModelLoader loader;
     vertices = loader.LoadObj("../../Resources/Models/BalconyModel.obj");
-    
     std::cout << sizeof(vertices) << " bytes of vertices: " << vertices.size() << "\n";
 
     // Device
@@ -48,6 +47,8 @@ bool RenderManager::Initialize(HWND hwnd)
     clearValue.DepthStencil.Depth = 1.0f;
     clearValue.DepthStencil.Stencil = 0;
 
+    // CreateBuffer() function defined in BufferManager.h cannot be used here since
+    // it does not have the flexibility to define an riidSource or WRITE state
     device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
         D3D12_HEAP_FLAG_NONE,
@@ -56,6 +57,9 @@ bool RenderManager::Initialize(HWND hwnd)
         &clearValue,
         IID_PPV_ARGS(&depthBuffer)
     );
+    // This could later be modified, though this would not have any benefits
+    // because adding any more parameters to CreateBuffer() would simply be
+    // recreating the CreateCommittedResource function.
     #pragma endregion
 
     #pragma region dsvHeap
@@ -122,8 +126,11 @@ bool RenderManager::Initialize(HWND hwnd)
         rtvHeap->GetCPUDescriptorHandleForHeapStart()
     );
 
-    for (UINT i = 0; i < FrameCount; i++)
-    {
+    // Create "FrameCount" number of buffers
+    // By default this is 2, though I've read that most engines prefer 3 to keep the GPU busy
+    // This Engine is simple, so either will work just fine, though you can tweak this value in
+    //                              include/RenderManager.h
+    for (UINT i = 0; i < FrameCount; i++) {
         swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTargets[i]));
         device->CreateRenderTargetView(
             renderTargets[i].Get(),
@@ -148,7 +155,7 @@ bool RenderManager::Initialize(HWND hwnd)
         IID_PPV_ARGS(&commandList)
     );
 
-    commandList->Close();
+    // commandList->Close();
     #pragma endregion
 
     #pragma region Fence (Synchronization)
@@ -222,6 +229,7 @@ bool RenderManager::Initialize(HWND hwnd)
     constBufferView.BufferLocation = constBuffer->GetGPUVirtualAddress();
     constBufferView.SizeInBytes = 256;
     // Hard coded 256 byte size because 3 XMMATRIX (world, view, proj) has to round to 256 bytes for GPU standards
+    // This is explicit in include/Camera.h "DXCamBuffer" struct definition alignas.
 
     D3D12_CPU_DESCRIPTOR_HANDLE HDesc = cbvHeap->GetCPUDescriptorHandleForHeapStart();
     device->CreateConstantBufferView(&constBufferView, HDesc);
