@@ -1,4 +1,2 @@
-*.h linguist-language=C++
 *.cpp linguist-language=C++
-
 *.hlsl linguist-language=HLSL
