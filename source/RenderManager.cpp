@@ -33,8 +33,7 @@ bool RenderManager::Initialize(HWND hwnd)
     #pragma region define depthBuffer
     D3D12_RESOURCE_DESC depthDesc = {};
     depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    depthDesc.Width = width;
-    depthDesc.Height = height;
+    depthDesc.Width = width; depthDesc.Height = height;
     depthDesc.DepthOrArraySize = 1;
     depthDesc.MipLevels = 1;
     depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -89,16 +88,17 @@ bool RenderManager::Initialize(HWND hwnd)
     #pragma region Swap Chain
     ComPtr<IDXGIFactory4> factory;
     CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+    // This will return a DXGIFactory1, which is outdated compared to DXGIFactory4
 
     DXGI_SWAP_CHAIN_DESC1 scDesc = {};
     scDesc.BufferCount = FrameCount;
-    scDesc.Width = width;
-    scDesc.Height = height;
+    scDesc.Width = width; scDesc.Height = height;
     scDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     scDesc.SampleDesc.Count = 1;
 
+    // So down here we have to use IDXGISwapChain1 to correspond to DXGIFactory1
     ComPtr<IDXGISwapChain1> tempSwapChain;
     factory->CreateSwapChainForHwnd(
         commandQueue.Get(),
@@ -109,6 +109,8 @@ bool RenderManager::Initialize(HWND hwnd)
         &tempSwapChain
     );
 
+    // And to be able to use more modern features (ComPtr<IDXGISwapChain3> swapChain),
+    // I ask COM to give the IDXGISwapChain1 as IDXGISwapChain3
     tempSwapChain.As(&swapChain);
     frameIndex = swapChain->GetCurrentBackBufferIndex();
     #pragma endregion
