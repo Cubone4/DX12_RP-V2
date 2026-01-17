@@ -9,3 +9,6 @@ Currently, the move direction is tied to a global axis and not relative look dir
 - Hold right click to look around
 - While holding right click, use WASD to move around
 - Q to move down, E to move up
+
+<img width="936" height="676" alt="image" src="https://github.com/user-attachments/assets/e396c9cc-de71-41f8-9c9c-6e127b6bae58" />
+
